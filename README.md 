@@ -1,0 +1,1075 @@
+# 📦 Inventory Management System
+
+A comprehensive inventory management system built with Spring Boot, MySQL, and Docker. Manage products, suppliers, customers, orders, and track inventory in real-time.
+
+![Java](https://img.shields.io/badge/Java-17-blue)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.4.1-green)
+![MySQL](https://img.shields.io/badge/MySQL-8.0-orange)
+![Docker](https://img.shields.io/badge/Docker-enabled-blue)
+![License](https://img.shields.io/badge/License-MIT-yellow)
+
+---
+
+## 🚀 Features
+
+### Core Modules
+- **Product Management** - Create, update, delete, and track products
+- **Category Management** - Organize products into categories
+- **Supplier Management** - Manage supplier information and relationships
+- **Customer Management** - Track customer details and order history
+- **Incoming Orders** - Receive stock from suppliers
+- **Outgoing Orders** - Process customer orders and shipments
+- **Real-time Inventory Tracking** - Automatic stock level updates
+- **Low Stock Alerts** - Get notified when inventory runs low
+
+
+### Technical Features
+- ✅ RESTful API with comprehensive endpoints
+- ✅ DTO pattern for clean data transfer
+- ✅ MySQL database
+- ✅ Docker containerization for easy deployment
+- ✅ Spring Security for authentication/Authorization
+- ✅ Input validation
+- ✅ Exception handling
+- ✅ Swagger/OpenAPI documentation
+
+---
+
+## 📋 Table of Contents
+
+1. [Prerequisites](#prerequisites)
+2. [Installation](#installation)
+3. [Configuration](#configuration)
+4. [Running the Application](#running-the-application)
+5. [API Documentation](#api-documentation)
+6. [Database Schema](#database-schema)
+7. [Docker Setup](#docker-setup)
+8. [Usage Examples](#usage-examples)
+9. [Testing](#testing)
+10. [Troubleshooting](#troubleshooting)
+
+## 🔧 Prerequisites
+
+Before you begin, ensure you have the following installed:
+
+- **Java 17+** - [Download JDK](https://adoptium.net/)
+- **Maven 3.8+** - [Download Maven](https://maven.apache.org/download.cgi)
+- **Docker & Docker Compose** - [Download Docker](https://www.docker.com/get-started)
+- **MySQL 8.0+** (if not using Docker) - [Download MySQL](https://dev.mysql.com/downloads/)
+- **Git** - [Download Git](https://git-scm.com/)
+
+**Optional:**
+- IntelliJ IDEA / Eclipse / VS Code
+- Postman / Insomnia (for API testing)
+
+---
+
+## 📥 Installation
+
+### 1. Clone the Repository
+git clone https://github.com/bluederrick/INVENTORY-MANAGEMENT-SYSTEM.git
+cd INVENTORY-MANAGEMENT-SYSTEM
+```
+
+### 2. Build the Project
+
+# Clean and install dependencies
+mvn clean install
+
+# Skip tests if needed
+mvn clean install -DskipTests
+```
+
+---
+
+## ⚙️ Configuration
+
+### Application Properties
+
+
+# Application
+spring.application.name=InventoryManagementSystem
+server.port=8080
+
+app.base-url=/api/v1
+
+# Database Configuration
+spring.datasource.url=jdbc:mysql://localhost:3306/inventory_db?useSSL=false&serverTimezone=UTC
+spring.datasource.username=root
+spring.datasource.password=your_password
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+
+# JPA/Hibernate
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect
+
+# Logging
+logging.level.com.stockhub=DEBUG
+logging.level.org.springframework.web=INFO
+logging.level.org.hibernate.SQL=DEBUG
+### Environment Variables (Optional)
+
+
+
+
+DB_HOST=localhost
+DB_PORT=3306
+DB_NAME=inventory_db
+DB_USER=root
+DB_PASSWORD=your_password
+SERVER_PORT=8080
+```
+
+---
+
+## 🏃 Running the Application
+
+### Option 1: Local Development (Without Docker)
+
+#### Step 1: Start MySQL
+```bash
+# Start MySQL service
+# macOS
+brew services start mysql
+
+# Linux
+sudo systemctl start mysql
+
+# Windows
+# Start from Services app
+```
+
+#### Step 2: Create Database
+```bash
+mysql -u root -p
+
+CREATE DATABASE inventory_db;
+exit;
+```
+
+#### Step 3: Run Application
+```bash
+# Using Maven
+mvn spring-boot:run
+
+# Or run the JAR
+java -jar target/InventoryManagementSystem-0.0.1-SNAPSHOT.jar
+```
+
+Application will start at: **http://localhost:8080**
+
+---
+
+### Option 2: Docker (Recommended)
+
+#### Step 1: Build Docker Image
+```bash
+# Build application JAR
+mvn clean package -DskipTests
+
+# Build Docker image
+docker build -t inventory-management-system .
+```
+
+#### Step 2: Run with Docker Compose
+```bash
+# Start all services (MySQL + Spring Boot)
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop services
+docker-compose down
+```
+
+Application will start at: **http://localhost:8080**
+
+---
+
+## 📚 API Documentation
+
+### Base URL
+```
+http://localhost:8080/api
+```
+
+
+
+---
+
+### 📦 Product Endpoints
+
+#### Get All Products
+```http
+GET /api/products
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Success",
+  "data": [
+    {
+      "id": 1,
+      "name": "Laptop",
+      "description": "Dell XPS 15",
+      "sku": "LAP-001",
+      "price": 999.99,
+      "quantity": 50,
+      "category_id": 1,
+      "supplier_id": 1,
+      "stock_status": "IN_STOCK",
+      "created_at": "2025-02-16T10:00:00",
+      "updated_at": "2025-02-16T10:00:00"
+    }
+  ],
+  "count": 1
+}
+```
+
+#### Get Product by ID
+```http
+GET /api/products/{}/baseURL/{id}
+```
+
+#### Create Product
+```http
+POST /api/products
+Content-Type: application/json
+
+{
+  "name": "Laptop",
+  "description": "Dell XPS 15",
+  "sku": "LAP-001",
+  "price": 999.99,
+  "quantity": 50,
+  "reorder_level": 10,
+  "category_id": 1,
+  "supplier_id": 1
+}
+```
+
+#### Update Product
+```http
+PUT /api/products/{id}
+Content-Type: application/json
+
+{
+  "id": 1,
+  "name": "Laptop Pro",
+  "price": 1099.99,
+  "quantity": 45
+}
+```
+
+#### Delete Product
+```http
+DELETE /api/products/{id}
+```
+
+#### Search Products
+```http
+GET /api/products/search?name=laptop
+```
+
+#### Low Stock Products
+```http
+GET /api/products/low-stock?threshold=10
+```
+
+---
+
+### 🏷️ Category Endpoints
+
+#### Get All Categories
+```http
+GET /api/categories
+```
+
+#### Get Category by ID
+```http
+GET /api/categories/{id}
+```
+
+#### Create Category
+```http
+POST /api/categories
+Content-Type: application/json
+
+{
+  "name": "Electronics",
+  "description": "Electronic devices and accessories"
+}
+```
+
+#### Update Category
+```http
+PUT /api/categories/{id}
+```
+
+#### Delete Category
+```http
+DELETE /api/categories/{id}
+```
+
+---
+
+### 🚚 Supplier Endpoints
+
+#### Get All Suppliers
+```http
+GET /api/suppliers
+```
+
+#### Get Supplier by ID
+```http
+GET /api/suppliers/{id}
+```
+
+#### Create Supplier
+```http
+POST /api/suppliers
+Content-Type: application/json
+
+{
+  "name": "Tech Supplies Inc.",
+  "contact_person": "John Doe",
+  "email": "john@techsupplies.com",
+  "phone": "+1234567890",
+  "address": "123 Tech Street, Silicon Valley, CA"
+}
+```
+
+#### Update Supplier
+```http
+PUT /api/suppliers/{id}
+```
+
+#### Delete Supplier
+```http
+DELETE /api/suppliers/{id}
+```
+
+---
+
+### 👥 Customer Endpoints
+
+#### Get All Customers
+```http
+GET /api/customers
+```
+
+#### Get Customer by ID
+```http
+GET /api/customers/{id}
+```
+
+#### Create Customer
+```http
+POST /api/customers
+Content-Type: application/json
+
+{
+  "name": "Alice Smith",
+  "email": "alice@example.com",
+  "phone": "+1987654321",
+  "address": "456 Customer Ave, New York, NY"
+}
+```
+
+#### Update Customer
+```http
+PUT /api/customers/{id}
+```
+
+#### Delete Customer
+```http
+DELETE /api/customers/{id}
+```
+
+---
+
+### 📥 Incoming Order Endpoints
+
+#### Get All Incoming Orders
+```http
+GET /api/incoming-orders
+```
+
+#### Get Incoming Order by ID
+```http
+GET /api/incoming-orders/{id}
+```
+
+#### Create Incoming Order
+```http
+POST /api/incoming-orders
+Content-Type: application/json
+
+{
+  "supplier_id": 1,
+  "order_date": "2025-02-16",
+  "expected_delivery": "2025-02-20",
+  "status": "PENDING",
+  "items": [
+    {
+      "product_id": 1,
+      "quantity": 100,
+      "unit_price": 900.00
+    }
+  ]
+}
+```
+
+#### Receive Incoming Order
+```http
+POST /api/incoming-orders/{id}/receive
+
+# Automatically updates product quantities
+```
+
+#### Update Incoming Order
+```http
+PUT /api/incoming-orders/{id}
+```
+
+#### Delete Incoming Order
+```http
+DELETE /api/incoming-orders/{id}
+```
+
+---
+
+### 📤 Outgoing Order Endpoints
+
+#### Get All Outgoing Orders
+```http
+GET /api/outgoing-orders
+```
+
+#### Get Outgoing Order by ID
+```http
+GET /api/outgoing-orders/{id}
+```
+
+#### Create Outgoing Order
+```http
+POST /api/outgoing-orders
+Content-Type: application/json
+
+{
+  "customer_id": 1,
+  "order_date": "2025-02-16",
+  "status": "PENDING",
+  "items": [
+    {
+      "product_id": 1,
+      "quantity": 2,
+      "unit_price": 999.99
+    }
+  ]
+}
+```
+
+#### Process Outgoing Order
+```http
+POST /api/outgoing-orders/{id}/process
+
+# Automatically deducts product quantities
+```
+
+#### Update Outgoing Order
+```http
+PUT /api/outgoing-orders/{id}
+```
+
+#### Delete Outgoing Order
+```http
+DELETE /api/outgoing-orders/{id}
+```
+
+---
+
+## 🗃️ Database Schema
+
+### Entity Relationship Diagram
+```
+┌─────────────┐         ┌──────────────┐         ┌─────────────┐
+│  Category   │◄────────│   Product    │────────►│  Supplier   │
+│             │  1:N    │              │  N:1    │             │
+│ id          │         │ id           │         │ id          │
+│ name        │         │ name         │         │ name        │
+│ description │         │ sku          │         │ contact     │
+└─────────────┘         │ price        │         │ email       │
+                        │ quantity     │         │ phone       │
+                        │ category_id  │         └─────────────┘
+                        │ supplier_id  │
+                        └──────────────┘
+                               │
+                    ┌──────────┴──────────┐
+                    │                     │
+            ┌───────▼────────┐    ┌──────▼────────┐
+            │ IncomingOrder  │    │ OutgoingOrder │
+            │                │    │               │
+            │ id             │    │ id            │
+            │ supplier_id    │    │ customer_id   │
+            │ order_date     │    │ order_date    │
+            │ status         │    │ status        │
+            └────────────────┘    └───────────────┘
+                    │                     │
+            ┌───────▼────────┐    ┌──────▼────────┐
+            │IncomingOrderItem│   │OutgoingOrderItem│
+            │                │    │               │
+            │ id             │    │ id            │
+            │ order_id       │    │ order_id      │
+            │ product_id     │    │ product_id    │
+            │ quantity       │    │ quantity      │
+            │ unit_price     │    │ unit_price    │
+            └────────────────┘    └───────────────┘
+                    │                     │
+                    └──────────┬──────────┘
+                               │
+                        ┌──────▼────────┐
+                        │   Customer    │
+                        │               │
+                        │ id            │
+                        │ name          │
+                        │ email         │
+                        │ phone         │
+                        │ address       │
+                        └───────────────┘
+```
+
+### Database Tables
+
+#### products
+```sql
+CREATE TABLE products (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    sku VARCHAR(100) UNIQUE NOT NULL,
+    price DECIMAL(10,2) NOT NULL,
+    quantity INT NOT NULL DEFAULT 0,
+    reorder_level INT DEFAULT 10,
+    category_id BIGINT,
+    supplier_id BIGINT,
+    created_at DATETIME NOT NULL,
+    updated_at DATETIME NOT NULL,
+    FOREIGN KEY (category_id) REFERENCES categories(id),
+    FOREIGN KEY (supplier_id) REFERENCES suppliers(id)
+);
+```
+
+#### categories
+```sql
+CREATE TABLE categories (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL UNIQUE,
+    description TEXT,
+    created_at DATETIME NOT NULL,
+    updated_at DATETIME NOT NULL
+);
+```
+
+#### suppliers
+```sql
+CREATE TABLE suppliers (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    contact_person VARCHAR(255),
+    email VARCHAR(255),
+    phone VARCHAR(50),
+    address TEXT,
+    created_at DATETIME NOT NULL,
+    updated_at DATETIME NOT NULL
+);
+```
+
+#### customers
+```sql
+CREATE TABLE customers (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) UNIQUE,
+    phone VARCHAR(50),
+    address TEXT,
+    created_at DATETIME NOT NULL,
+    updated_at DATETIME NOT NULL
+);
+```
+
+#### incoming_orders
+```sql
+CREATE TABLE incoming_orders (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    supplier_id BIGINT NOT NULL,
+    order_date DATE NOT NULL,
+    expected_delivery DATE,
+    actual_delivery DATE,
+    status VARCHAR(50) NOT NULL, -- PENDING, RECEIVED, CANCELLED
+    notes TEXT,
+    total_amount DECIMAL(10,2),
+    created_at DATETIME NOT NULL,
+    updated_at DATETIME NOT NULL,
+    FOREIGN KEY (supplier_id) REFERENCES suppliers(id)
+);
+```
+
+#### incoming_order_items
+```sql
+CREATE TABLE incoming_order_items (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    order_id BIGINT NOT NULL,
+    product_id BIGINT NOT NULL,
+    quantity INT NOT NULL,
+    unit_price DECIMAL(10,2) NOT NULL,
+    created_at DATETIME NOT NULL,
+    FOREIGN KEY (order_id) REFERENCES incoming_orders(id) ON DELETE CASCADE,
+    FOREIGN KEY (product_id) REFERENCES products(id)
+);
+```
+
+#### outgoing_orders
+```sql
+CREATE TABLE outgoing_orders (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    customer_id BIGINT NOT NULL,
+    order_date DATE NOT NULL,
+    shipping_date DATE,
+    status VARCHAR(50) NOT NULL, -- PENDING, PROCESSING, SHIPPED, DELIVERED, CANCELLED
+    notes TEXT,
+    total_amount DECIMAL(10,2),
+    created_at DATETIME NOT NULL,
+    updated_at DATETIME NOT NULL,
+    FOREIGN KEY (customer_id) REFERENCES customers(id)
+);
+```
+
+#### outgoing_order_items
+```sql
+CREATE TABLE outgoing_order_items (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    order_id BIGINT NOT NULL,
+    product_id BIGINT NOT NULL,
+    quantity INT NOT NULL,
+    unit_price DECIMAL(10,2) NOT NULL,
+    created_at DATETIME NOT NULL,
+    FOREIGN KEY (order_id) REFERENCES outgoing_orders(id) ON DELETE CASCADE,
+    FOREIGN KEY (product_id) REFERENCES products(id)
+);
+```
+
+---
+
+## 🐳 Docker Setup
+
+### Dockerfile
+```dockerfile
+# Build stage
+FROM maven:3.9-eclipse-temurin-17 AS build
+WORKDIR /app
+COPY pom.xml .
+COPY src ./src
+RUN mvn clean package -DskipTests
+
+# Run stage
+FROM eclipse-temurin:17-jre-alpine
+WORKDIR /app
+COPY --from=build /app/target/*.jar app.jar
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "app.jar"]
+```
+
+### docker-compose.yml
+```yaml
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: inventory-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: inventory_db
+      MYSQL_USER: inventory_user
+      MYSQL_PASSWORD: inventory_pass
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - inventory-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    container_name: inventory-app
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/inventory_db?useSSL=false&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: inventory_user
+      SPRING_DATASOURCE_PASSWORD: inventory_pass
+    ports:
+      - "8080:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - inventory-network
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
+
+networks:
+  inventory-network:
+    driver: bridge
+```
+
+### Docker Commands
+```bash
+# Build and start
+docker-compose up -d --build
+
+# View logs
+docker-compose logs -f app
+
+# Stop services
+docker-compose down
+
+# Remove everything (including volumes)
+docker-compose down -v
+
+# Restart services
+docker-compose restart
+
+# Access MySQL
+docker exec -it inventory-mysql mysql -u root -p
+```
+
+---
+
+## 💡 Usage Examples
+
+### Complete Workflow Example
+
+#### 1. Create Category
+```bash
+curl -X POST http://localhost:8080/api/categories \
+  -u admin:admin123 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Electronics",
+    "description": "Electronic devices"
+  }'
+```
+
+#### 2. Create Supplier
+```bash
+curl -X POST http://localhost:8080/api/suppliers \
+  -u admin:admin123 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Tech Supplies Inc.",
+    "email": "contact@techsupplies.com",
+    "phone": "+1234567890"
+  }'
+```
+
+#### 3. Create Product
+```bash
+curl -X POST http://localhost:8080/api/products \
+  -u admin:admin123 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Laptop",
+    "sku": "LAP-001",
+    "price": 999.99,
+    "quantity": 0,
+    "reorder_level": 10,
+    "category_id": 1,
+    "supplier_id": 1
+  }'
+```
+
+#### 4. Create Incoming Order (Receive Stock)
+```bash
+curl -X POST http://localhost:8080/api/incoming-orders \
+  -u admin:admin123 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "supplier_id": 1,
+    "order_date": "2025-02-16",
+    "status": "PENDING",
+    "items": [
+      {
+        "product_id": 1,
+        "quantity": 100,
+        "unit_price": 900.00
+      }
+    ]
+  }'
+```
+
+#### 5. Receive the Order
+```bash
+curl -X POST http://localhost:8080/api/incoming-orders/1/receive \
+  -u admin:admin123
+
+# Product quantity automatically updated: 0 → 100
+```
+
+#### 6. Create Customer
+```bash
+curl -X POST http://localhost:8080/api/customers \
+  -u admin:admin123 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Alice Smith",
+    "email": "alice@example.com",
+    "phone": "+1987654321"
+  }'
+```
+
+#### 7. Create Outgoing Order (Sell Product)
+```bash
+curl -X POST http://localhost:8080/api/outgoing-orders \
+  -u admin:admin123 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "customer_id": 1,
+    "order_date": "2025-02-16",
+    "status": "PENDING",
+    "items": [
+      {
+        "product_id": 1,
+        "quantity": 2,
+        "unit_price": 999.99
+      }
+    ]
+  }'
+```
+
+#### 8. Process the Order
+```bash
+curl -X POST http://localhost:8080/api/outgoing-orders/1/process \
+  -u admin:admin123
+
+# Product quantity automatically updated: 100 → 98
+```
+
+#### 9. Check Low Stock
+```bash
+curl -X GET "http://localhost:8080/api/products/low-stock?threshold=10" \
+  -u admin:admin123
+```
+
+---
+
+## 🧪 Testing
+
+### Run Unit Tests
+```bash
+mvn test
+```
+
+### Run Integration Tests
+```bash
+mvn verify
+```
+
+### Test Coverage
+```bash
+mvn clean test jacoco:report
+
+# View report at: target/site/jacoco/index.html
+```
+
+### Manual API Testing with Postman
+
+1. Import the Postman collection: `postman_collection.json`
+2. Set environment variables:
+   - `base_url`: http://localhost:8080
+   - `username`: admin
+   - `password`: admin123
+3. Run collection tests
+
+---
+
+## 🔧 Troubleshooting
+
+### Common Issues
+
+#### 1. Port Already in Use
+```bash
+# Error: Port 8080 is already in use
+
+# Solution: Change port in application.properties
+server.port=8081
+
+# Or kill the process using port 8080
+# macOS/Linux
+lsof -ti:8080 | xargs kill -9
+
+# Windows
+netstat -ano | findstr :8080
+taskkill /PID <PID> /F
+```
+
+#### 2. MySQL Connection Refused
+```bash
+# Error: Connection refused
+
+# Check MySQL is running
+docker ps
+
+# Restart MySQL container
+docker-compose restart mysql
+
+# Check logs
+docker-compose logs mysql
+```
+
+#### 3. Tables Not Created
+```bash
+# Solution: Check ddl-auto setting
+spring.jpa.hibernate.ddl-auto=update
+
+# Or manually create tables
+mysql -u root -p inventory_db < schema.sql
+```
+
+#### 4. Build Fails
+```bash
+# Clean Maven cache
+mvn clean
+
+# Delete target folder
+rm -rf target
+
+# Rebuild
+mvn clean install -U
+```
+
+#### 5. Docker Build Fails
+```bash
+# Clear Docker cache
+docker system prune -a
+
+# Rebuild without cache
+docker-compose build --no-cache
+```
+
+---
+
+## 📊 Monitoring & Logging
+
+### Application Logs
+```bash
+# View logs in real-time
+tail -f logs/application.log
+
+# Docker logs
+docker-compose logs -f app
+```
+
+### Health Check
+```bash
+curl http://localhost:8080/actuator/health
+```
+
+### Metrics (if actuator is enabled)
+```bash
+curl http://localhost:8080/actuator/metrics
+```
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please follow these steps:
+
+1. **Fork the repository**
+2. **Create a feature branch**
+```bash
+   git checkout -b feature/amazing-feature
+```
+3. **Commit your changes**
+```bash
+   git commit -m "Add amazing feature"
+```
+4. **Push to the branch**
+```bash
+   git push origin feature/amazing-feature
+```
+5. **Open a Pull Request**
+
+### Coding Standards
+- Follow Java naming conventions
+- Write unit tests for new features
+- Update documentation
+- Keep commits atomic and descriptive
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 👨‍💻 Author
+
+**Derrick Blue**
+- GitHub: [@bluederrick](https://github.com/bluederrick)
+- Email: derrick@example.com
+
+---
+
+## 🙏 Acknowledgments
+
+- Spring Boot Team
+- MySQL Community
+- Docker Community
+- All contributors
+
+---
+
+## 📞 Support
+
+For support, email derrick@example.com or open an issue on GitHub.
+
+---
+
+## 🗺️ Roadmap
+
+- [ ] Add user authentication with JWT
+- [ ] Implement role-based access control
+- [ ] Add email notifications for low stock
+- [ ] Generate PDF reports
+- [ ] Add barcode scanning
+- [ ] Implement batch operations
+- [ ] Add GraphQL API
+- [ ] Mobile app integration
+- [ ] Multi-warehouse support
+- [ ] Analytics dashboard
+
+---
+
+## 📸 Screenshots
+
+![Dashboard](screenshots/dashboard.png)
+![Products](screenshots/products.png)
+![Orders](screenshots/orders.png)
+
+---
+
+**Built with ❤️ using Spring Boot**
